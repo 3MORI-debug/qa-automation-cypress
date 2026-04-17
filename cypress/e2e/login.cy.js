@@ -1,30 +1,33 @@
-describe('Login Test', () => {
-  it('Deve fazer login com sucesso', () => {
+describe('Login', () => {
+
+  beforeEach(() => {
     cy.visit('https://www.saucedemo.com/')
-
-    cy.get('[data-test="username"]').type('standard_user')
-    cy.get('[data-test="password"]').type('secret_sauce')
-
-    cy.get('[data-test="login-button"]').click()
-
-    cy.url().should('include', '/inventory')
   })
-})
 
-  it('Não deve fazer login com senha inválida', () => {
-    cy.visit('https://www.saucedemo.com/')
-
-    cy.get('[data-test="username"]').type('standard_user')
-    cy.get('[data-test="password"]').type('senha_errada')
-
-    cy.get('[data-test="login-button"]').click()
-
-    cy.get('[data-test="error"]').should('be.visible')
+  describe('Cenários positivos', () => {
+    it('Login com sucesso', () => {
+      cy.login('standard_user', 'secret_sauce')
+      cy.url().should('include', '/inventory')
+    })
   })
-it('Não deve fazer login com campos vazios', () => {
-  cy.visit('https://www.saucedemo.com/')
 
-  cy.get('[data-test="login-button"]').click()
+  describe('Cenários negativos', () => {
 
-  cy.get('[data-test="error"]').should('be.visible')
+    it('Senha inválida', () => {
+      cy.login('standard_user', 'errado')
+      cy.contains('Username and password do not match')
+    })
+
+    it('Usuário bloqueado', () => {
+      cy.login('locked_out_user', 'secret_sauce')
+      cy.contains('locked out')
+    })
+
+    it('Campos vazios', () => {
+      cy.get('[data-test="login-button"]').click()
+      cy.contains('Username is required')
+    })
+
+  })
+
 })
